@@ -24,6 +24,31 @@ const client = new MongoClient(uri, {
 async function run(){
 try{
   const usersCollection = client.db("dev-platform").collection("users");
+  const postCollection = client.db("dev-platform").collection("post");
+
+
+//Save post to database
+app.post('/post', async(req, res) => {
+    const post = req.body;
+    const result = await postCollection.insertOne(post);
+    res.send(result);
+})
+
+//get all post
+app.get('/posts', async(req, res) =>{
+    const query = {};
+    const cursor = postCollection.find(query);
+    const posts = await cursor.sort({dateField: -1}).toArray();
+    res.send(posts);
+})
+
+//get details post
+app.get("/post/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: ObjectId(id) };
+  const result = await postCollection.findOne(query);
+  res.send(result);
+});
 
   // Save users to database
   app.post("/users", async (req, res) => {
