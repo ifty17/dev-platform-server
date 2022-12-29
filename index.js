@@ -27,6 +27,20 @@ try{
   const postCollection = client.db("dev-platform").collection("post");
   const commentsCollection = client.db("dev-platform").collection("comments");
 
+//get comments of post
+app.get("/commentsbyid", async (req, res) => {
+  let query = {};
+  if (req.query.commentId) {
+    query = {
+      commentId: req.query.commentId,
+    };
+  }
+  const result = commentsCollection.find(query).sort({ dateField: -1 });
+  const comments = await result.toArray();
+  res.send(comments);
+});
+
+
   //post comments to db
     app.post("/comments", async (req, res) => {
       const post = req.body;
