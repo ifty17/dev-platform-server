@@ -79,16 +79,17 @@ app.get("/commentsbyid", async (req, res) => {
     });
 
 
-  //update media info api
+  //update like info api
     app.put("/feeds/:id", async (req, res) => {
       const id = req.params.id;
+      console.log(id);
       const filter = { _id: ObjectId(id) };
       const post = req.body;
       console.log(post);
       const option = { upsert: true };
       const updatedReactions = {
         $set: {
-          reactions: post.reactions,
+          reactions: post.like,
         },
       };
       const result = await postCollection.updateOne(
@@ -98,6 +99,15 @@ app.get("/commentsbyid", async (req, res) => {
       );
       res.send(result);
     });
+
+    // get most reacted post
+    app.get('/mostreacted', async(req, res) =>{
+        const query = {};
+        const result = await postCollection.find(query);
+        const post = await result.limit(3).sort({reactions: -1}).toArray();
+        res.send(post);
+    })
+
 
   //Save post to database
   app.post("/post", async (req, res) => {
