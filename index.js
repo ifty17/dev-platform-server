@@ -25,7 +25,14 @@ async function run(){
 try{
   const usersCollection = client.db("dev-platform").collection("users");
   const postCollection = client.db("dev-platform").collection("post");
+  const commentsCollection = client.db("dev-platform").collection("comments");
 
+  //post comments to db
+    app.post("/comments", async (req, res) => {
+      const post = req.body;
+      const result = await commentsCollection.insertOne(post);
+      res.send(result);
+    });
 
 
   //get user by id
@@ -52,6 +59,27 @@ try{
       const result = await usersCollection.updateOne(
         filter,
         updatedUser,
+        option
+      );
+      res.send(result);
+    });
+
+
+  //update media info api
+    app.put("/feeds/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const post = req.body;
+      console.log(post);
+      const option = { upsert: true };
+      const updatedReactions = {
+        $set: {
+          reactions: post.reactions,
+        },
+      };
+      const result = await postCollection.updateOne(
+        filter,
+        updatedReactions,
         option
       );
       res.send(result);
